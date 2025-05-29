@@ -11,9 +11,13 @@ public class Player : MonoBehaviour
     public Rigidbody2D rigid;
     public Animator animator;
     public SpriteRenderer spriteRenderer;
+    public const float initialPlayerGravityScale = 3f;
     public float moveInput;
+    public float climbInput;
     public bool isJumped;
     public bool isGrounded;
+    public bool isLadder;
+    public bool isClimbing;
 
     public readonly int IDLE_HASH = Animator.StringToHash("Idle_Fox");
     public readonly int Run_HASH = Animator.StringToHash("Run_Fox");
@@ -35,8 +39,9 @@ public class Player : MonoBehaviour
     {
         stateMachine = new StateMachine();
         stateMachine.playerStateDic.Add(PlayerEState.Idle, new Player_Idle(this));
-        stateMachine.playerStateDic.Add(PlayerEState.Run, new Player_Walk(this));
+        stateMachine.playerStateDic.Add(PlayerEState.Run, new Player_Run(this));
         stateMachine.playerStateDic.Add(PlayerEState.Jump, new Player_Jump(this));
+        stateMachine.playerStateDic.Add(PlayerEState.Climb, new Player_Climb(this));
 
         stateMachine.CurState = stateMachine.playerStateDic[PlayerEState.Idle];
     }
@@ -44,9 +49,16 @@ public class Player : MonoBehaviour
     private void Update()
     {
         moveInput = Input.GetAxisRaw("Horizontal");
+        climbInput = Input.GetAxisRaw("Vertical");
         isJumped = Input.GetKeyDown(KeyCode.Space);
+        isClimbing = climbInput != 0;
 
         stateMachine.Update();
+        Debug.Log($"isGrounded : {isGrounded}");
+        Debug.Log($"isLadder : {isLadder}");
+        Debug.Log($"gravityScale : {rigid.gravityScale}");
+        Debug.Log($"isClimbing : {isClimbing}");
+
     }
 
     private void FixedUpdate()
@@ -59,6 +71,22 @@ public class Player : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.gameObject.CompareTag("Ladder"))
+        {
+            isLadder = true;
+        }   
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Ladder"))
+        {
+            isLadder = false;
         }
     }
 }
