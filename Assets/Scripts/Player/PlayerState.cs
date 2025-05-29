@@ -88,12 +88,10 @@ public class Player_Run : PlayerState
         if (player.moveInput < 0)
         {
             player.spriteRenderer.flipX = true;
-
         }
         else
         {
             player.spriteRenderer.flipX = false;
-
         }
     }
 
@@ -101,8 +99,6 @@ public class Player_Run : PlayerState
     {
         player.rigid.velocity = new Vector2(player.moveInput * player.moveSpeed, player.rigid.velocity.y);
     }
-
-    public override void Exit() { }
 }
 #endregion
 
@@ -151,8 +147,6 @@ public class Player_Jump : PlayerState
     {
         player.rigid.velocity = new Vector2(player.moveInput * player.moveSpeed, player.rigid.velocity.y);
     }
-
-    public override void Exit() { }
 }
 #endregion
 
@@ -168,10 +162,12 @@ public class Player_Climb : PlayerState
     {
         Debug.Log("Climb Enter");
         player.animator.Play(player.Climb_HASH);
-        player.rigid.gravityScale = 0f;
 
         player.isJumped = false;
         player.isGrounded = false;
+
+        player.rigid.gravityScale = 0f;
+        player.rigid.velocity = new Vector2(0f,0f);
     }
 
     public override void Update()
