@@ -44,6 +44,7 @@ public class Player_Idle : PlayerState
 
     public override void Enter()
     {
+        Debug.Log("Idle Enter");
         player.animator.Play(player.IDLE_HASH);
         player.rigid.velocity = Vector3.zero;
     }
@@ -71,6 +72,7 @@ public class Player_Run : PlayerState
 
     public override void Enter()
     {
+        Debug.Log("Run Enter");
         player.animator.Play(player.Run_HASH);
     }
 
@@ -107,6 +109,8 @@ public class Player_Run : PlayerState
 #region Jump
 public class Player_Jump : PlayerState
 {
+    private float jumpTimer;
+
     public Player_Jump(Player _player) : base(_player)
     {
         hasPhysics = true;
@@ -114,6 +118,8 @@ public class Player_Jump : PlayerState
 
     public override void Enter()
     {
+        Debug.Log("Jump Enter");
+        jumpTimer = 0;
         player.animator.Play(player.Jump_HASH);
         player.rigid.AddForce(Vector2.up * player.jumpPower, ForceMode2D.Impulse);
         player.isJumped = false;
@@ -124,7 +130,10 @@ public class Player_Jump : PlayerState
     {
         base.Update();
 
-        if (player.isGrounded)
+        jumpTimer += Time.deltaTime;
+
+        // 최소 점프 시간 보장
+        if (jumpTimer > 0.15f && player.isGrounded)
         {
             player.stateMachine.ChangeState(player.stateMachine.playerStateDic[PlayerEState.Idle]);
         }
@@ -157,6 +166,7 @@ public class Player_Climb : PlayerState
 
     public override void Enter()
     {
+        Debug.Log("Climb Enter");
         player.animator.Play(player.Climb_HASH);
         player.rigid.gravityScale = 0f;
 
@@ -193,6 +203,7 @@ public class Player_Climb : PlayerState
 
     public override void Exit()
     {
+        player.animator.speed = 1f;
         player.isClimbing = false;
         player.rigid.gravityScale = Player.initialPlayerGravityScale;
     }

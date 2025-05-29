@@ -3,17 +3,25 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    public StateMachine stateMachine;
+
+    [Header("Ground Check Settings")]
+    [SerializeField] private Transform groundCheckPos;
+    [SerializeField] private float groundCheckRadius = 0.1f;
+    [SerializeField] private LayerMask groundLayer;
+
+    [Header("Player fields")]
     [SerializeField] public float moveSpeed;
     [SerializeField] public float jumpPower;
-
-    public StateMachine stateMachine;
 
     public Rigidbody2D rigid;
     public Animator animator;
     public SpriteRenderer spriteRenderer;
+    [Space(10)]
     public const float initialPlayerGravityScale = 3f;
     public float moveInput;
     public float climbInput;
+    [Space(10)]
     public bool isJumped;
     public bool isGrounded;
     public bool isLadder;
@@ -25,7 +33,7 @@ public class Player : MonoBehaviour
     public readonly int Crouch_HASH = Animator.StringToHash("Crouch_Fox");
     public readonly int Climb_HASH = Animator.StringToHash("Climb_Fox");
     public readonly int Hurt_HASH = Animator.StringToHash("Hurt_Fox");
-
+    
     private void Start()
     {
         rigid = GetComponent<Rigidbody2D>();
@@ -55,23 +63,16 @@ public class Player : MonoBehaviour
 
         stateMachine.Update();
         Debug.Log($"isGrounded : {isGrounded}");
-        Debug.Log($"isLadder : {isLadder}");
-        Debug.Log($"gravityScale : {rigid.gravityScale}");
-        Debug.Log($"isClimbing : {isClimbing}");
+        //Debug.Log($"isLadder : {isLadder}");
+        //Debug.Log($"gravityScale : {rigid.gravityScale}");
+        //Debug.Log($"isClimbing : {isClimbing}");
 
+        CheckGround();
     }
 
     private void FixedUpdate()
     {
         stateMachine.FixedUpdate();
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            isGrounded = true;
-        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -87,6 +88,20 @@ public class Player : MonoBehaviour
         if (collision.gameObject.CompareTag("Ladder"))
         {
             isLadder = false;
+        }
+    }
+
+    private void CheckGround()
+    {
+        isGrounded = Physics2D.OverlapCircle(groundCheckPos.position, groundCheckRadius, groundLayer);
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (groundCheckPos != null)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(groundCheckPos.position, groundCheckRadius);
         }
     }
 }
