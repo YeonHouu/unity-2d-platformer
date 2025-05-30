@@ -19,7 +19,7 @@ public class PlayerState : BaseState
     public override void Update()
     {
         // Jump
-        if (player.isJumped && player.isGrounded)
+        if ((player.isJumped && player.isGrounded) || (player.isJumped && player.isLadder))
         {
             player.stateMachine.ChangeState(player.stateMachine.playerStateDic[PlayerEState.Jump]);
         }
