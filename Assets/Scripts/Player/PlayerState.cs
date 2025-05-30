@@ -14,7 +14,11 @@ public class PlayerState : BaseState
         player = _player;
     }
 
-    public override void Enter() { }
+    public override void Enter() 
+    
+    { 
+        player.animator.speed = 1f;
+    }
 
     public override void Update()
     {
@@ -44,6 +48,7 @@ public class Player_Idle : PlayerState
 
     public override void Enter()
     {
+        //base.Enter();
         Debug.Log("Idle Enter");
         player.animator.Play(player.IDLE_HASH);
         player.rigid.velocity = Vector3.zero;
@@ -72,6 +77,7 @@ public class Player_Run : PlayerState
 
     public override void Enter()
     {
+        //base.Enter();
         Debug.Log("Run Enter");
         player.animator.Play(player.Run_HASH);
     }
@@ -199,6 +205,7 @@ public class Player_Climb : PlayerState
 
     public override void Exit()
     {
+        Debug.Log("Climb Exit");
         player.animator.speed = 1f;
         player.isClimbing = false;
         player.rigid.gravityScale = Player.initialPlayerGravityScale;
