@@ -14,15 +14,19 @@ public class PlayerState : BaseState
         player = _player;
     }
 
-    public override void Enter() { }
+    public override void Enter() 
+    
+    { 
+        player.animator.speed = 1f;
+    }
 
     public override void Update()
     {
         // Jump
-        if (player.isJumped && player.isGrounded)
+        if ((player.isJumped && player.isGrounded) || (player.isJumped && player.isLadder))
         {
             player.stateMachine.ChangeState(player.stateMachine.playerStateDic[PlayerEState.Jump]);
-        }
+        } 
 
         // Climb
         if (player.isClimbing && player.isLadder)
@@ -44,6 +48,7 @@ public class Player_Idle : PlayerState
 
     public override void Enter()
     {
+        base.Enter();
         Debug.Log("Idle Enter");
         player.animator.Play(player.IDLE_HASH);
         player.rigid.velocity = Vector3.zero;
@@ -72,6 +77,7 @@ public class Player_Run : PlayerState
 
     public override void Enter()
     {
+        base.Enter();
         Debug.Log("Run Enter");
         player.animator.Play(player.Run_HASH);
     }
@@ -167,15 +173,16 @@ public class Player_Climb : PlayerState
         player.isGrounded = false;
 
         player.rigid.gravityScale = 0f;
+        player.transform.position = new Vector2(player.centerX, player.transform.position.y);
         player.rigid.velocity = new Vector2(0f,0f);
     }
 
     public override void Update()
     {
         base.Update();
-        
-        // Climbing 중 멈추면 애니메이션 stop
-        if(player.climbInput == 0)
+    
+        // climbing 중 움직임 멈추면 애니메이션 stop
+        if (player.climbInput == 0)
         {
             player.animator.speed = 0;
         }
@@ -199,6 +206,7 @@ public class Player_Climb : PlayerState
 
     public override void Exit()
     {
+        Debug.Log("Climb Exit");
         player.animator.speed = 1f;
         player.isClimbing = false;
         player.rigid.gravityScale = Player.initialPlayerGravityScale;
