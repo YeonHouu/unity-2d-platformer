@@ -11,6 +11,9 @@ public class Player : MonoBehaviour
     [SerializeField] private float groundCheckRadius = 0.1f;
     [SerializeField] private LayerMask groundLayer;
 
+    [Header("Ladder")]
+    public float centerX;
+
     [Header("Player fields")]
     [SerializeField] public float moveSpeed;
     [SerializeField] public float jumpPower;
@@ -84,6 +87,7 @@ public class Player : MonoBehaviour
         if(collision.CompareTag("Ladder"))
         {
             isLadder = true;
+            centerX = collision.GetComponent<BoxCollider2D>().bounds.center.x;
         }    
     }
 
@@ -94,22 +98,6 @@ public class Player : MonoBehaviour
             isLadder = false;
         }
     }
-
-    //private void OnTriggerEnter2D(Collider2D collision)
-    //{
-    //    if(collision.gameObject.CompareTag("Ladder"))
-    //    {
-    //        isLadder = true;
-    //    }   
-    //}
-
-    //private void OnTriggerExit2D(Collider2D collision)
-    //{
-    //    if (collision.gameObject.CompareTag("Ladder"))
-    //    {
-    //        isLadder = false;
-    //    }
-    //}
 
     private void CheckGround()
     {
