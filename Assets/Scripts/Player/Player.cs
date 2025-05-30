@@ -4,11 +4,15 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     public StateMachine stateMachine;
+    [SerializeField] private LadderSensor ladderSensor;
 
     [Header("Ground Check Settings")]
     [SerializeField] private Transform groundCheckPos;
     [SerializeField] private float groundCheckRadius = 0.1f;
     [SerializeField] private LayerMask groundLayer;
+
+    [Header("Ladder")]
+    public float centerX;
 
     [Header("Player fields")]
     [SerializeField] public float moveSpeed;
@@ -40,6 +44,9 @@ public class Player : MonoBehaviour
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
+        ladderSensor.OnEnter += HandleLadderEnter;
+        ladderSensor.OnExit += HandleLadderExit;
+
         StateMachineInit();
     }
 
@@ -62,7 +69,7 @@ public class Player : MonoBehaviour
         isClimbing = climbInput != 0;
 
         stateMachine.Update();
-        Debug.Log($"isGrounded : {isGrounded}");
+        //Debug.Log($"isGrounded : {isGrounded}");
         //Debug.Log($"isLadder : {isLadder}");
         //Debug.Log($"gravityScale : {rigid.gravityScale}");
         //Debug.Log($"isClimbing : {isClimbing}");
@@ -75,17 +82,18 @@ public class Player : MonoBehaviour
         stateMachine.FixedUpdate();
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void HandleLadderEnter(GameObject collision)
     {
-        if(collision.gameObject.CompareTag("Ladder"))
+        if(collision.CompareTag("Ladder"))
         {
             isLadder = true;
-        }   
+            centerX = collision.GetComponent<BoxCollider2D>().bounds.center.x;
+        }    
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
+    private void HandleLadderExit(GameObject collision)
     {
-        if (collision.gameObject.CompareTag("Ladder"))
+        if (collision.CompareTag("Ladder"))
         {
             isLadder = false;
         }
