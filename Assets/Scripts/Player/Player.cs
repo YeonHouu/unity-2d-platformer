@@ -36,18 +36,20 @@ public class Player : MonoBehaviour , IDamageable
     public const float initialPlayerGravityScale = 3f;
     public float moveInput;
     public float climbInput;
+    public int facingDir;
     [Space(10)]
     public bool isJumped;
     public bool isGrounded;
     public bool isLadder;
     public bool isClimbing;
+    public bool isDamaged;
 
     public readonly int IDLE_HASH = Animator.StringToHash("Idle_Fox");
-    public readonly int Run_HASH = Animator.StringToHash("Run_Fox");
-    public readonly int Jump_HASH = Animator.StringToHash("Jump_Fox");
+    public readonly int RUN_HASH = Animator.StringToHash("Run_Fox");
+    public readonly int JUMP_HASH = Animator.StringToHash("Jump_Fox");
     public readonly int Crouch_HASH = Animator.StringToHash("Crouch_Fox");
-    public readonly int Climb_HASH = Animator.StringToHash("Climb_Fox");
-    public readonly int Hurt_HASH = Animator.StringToHash("Hurt_Fox");
+    public readonly int CLIMB_HASH = Animator.StringToHash("Climb_Fox");
+    public readonly int HURT_HASH = Animator.StringToHash("Hurt_Fox");
     
     private void Start()
     {
@@ -68,6 +70,7 @@ public class Player : MonoBehaviour , IDamageable
         stateMachine.playerStateDic.Add(PlayerEState.Run, new Player_Run(this));
         stateMachine.playerStateDic.Add(PlayerEState.Jump, new Player_Jump(this));
         stateMachine.playerStateDic.Add(PlayerEState.Climb, new Player_Climb(this));
+        stateMachine.playerStateDic.Add(PlayerEState.Hurt, new Player_Hurt(this));
 
         stateMachine.CurState = stateMachine.playerStateDic[PlayerEState.Idle];
     }
@@ -128,7 +131,7 @@ public class Player : MonoBehaviour , IDamageable
     public void TakeDamage()
     {
         OnPlayerDamaged?.Invoke(this);
-        Debug.Log("플레이어 공격받음");
+        isDamaged = true;
     }
 
     private void OnDrawGizmos()

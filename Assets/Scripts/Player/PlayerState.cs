@@ -14,9 +14,9 @@ public class PlayerState : BaseState
         player = _player;
     }
 
-    public override void Enter() 
-    
-    { 
+    public override void Enter()
+
+    {
         player.animator.speed = 1f;
     }
 
@@ -26,16 +26,23 @@ public class PlayerState : BaseState
         if ((player.isJumped && player.isGrounded) || (player.isJumped && player.isLadder))
         {
             player.stateMachine.ChangeState(player.stateMachine.playerStateDic[PlayerEState.Jump]);
-        } 
+        }
 
         // Climb
         if (player.isClimbing && player.isLadder)
         {
             player.stateMachine.ChangeState(player.stateMachine.playerStateDic[PlayerEState.Climb]);
         }
+
+        // Hurt
+        if(player.isDamaged)
+        {
+            player.stateMachine.ChangeState(player.stateMachine.playerStateDic[PlayerEState.Hurt]);
+        }
     }
 
     public override void Exit() { }
+
 }
 
 #region Idle
@@ -79,7 +86,7 @@ public class Player_Run : PlayerState
     {
         base.Enter();
         //Debug.Log("Run Enter");
-        player.animator.Play(player.Run_HASH);
+        player.animator.Play(player.RUN_HASH);
     }
 
     public override void Update()
@@ -93,12 +100,16 @@ public class Player_Run : PlayerState
 
         if (player.moveInput < 0)
         {
+            player.facingDir = -1;
             player.spriteRenderer.flipX = true;
         }
         else
         {
+            player.facingDir = 1;
             player.spriteRenderer.flipX = false;
         }
+
+
     }
 
     public override void FixedUpdate()
@@ -122,7 +133,7 @@ public class Player_Jump : PlayerState
     {
         //Debug.Log("Jump Enter");
         jumpTimer = 0;
-        player.animator.Play(player.Jump_HASH);
+        player.animator.Play(player.JUMP_HASH);
         player.rigid.AddForce(Vector2.up * player.jumpPower, ForceMode2D.Impulse);
         player.isJumped = false;
         player.isGrounded = false;
@@ -144,10 +155,12 @@ public class Player_Jump : PlayerState
 
         if (player.moveInput < 0)
         {
+            player.facingDir = -1;
             player.spriteRenderer.flipX = true;
         }
         else
         {
+            player.facingDir = 1;
             player.spriteRenderer.flipX = false;
         }
     }
@@ -158,9 +171,8 @@ public class Player_Jump : PlayerState
 
     private void EnemyHit()
     {
-        if(player.isAttacked)
+        if (player.isAttacked)
         {
-            //player.rigid.AddForce(Vector2.up * player.jumpPower, ForceMode2D.Impulse);
             player.rigid.velocity = new Vector2(player.rigid.velocity.x, player.jumpPower);
             Debug.Log("점프 반동 점프");
             player.isAttacked = false;
@@ -180,65 +192,7 @@ public class Player_Climb : PlayerState
     public override void Enter()
     {
         //Debug.Log("Climb Enter");
-        player.animator.Play(player.Climb_HASH);
-
-        player.isJumped = false;
-        player.isGrounded = false;
-
-        player.rigid.gravityScale = 0f;
-        player.transform.position = new Vector2(player.centerX, player.transform.position.y);
-        player.rigid.velocity = new Vector2(0f,0f);
-    }
-
-    public override void Update()
-    {
-        base.Update();
-    
-        // climbing 중 움직임 멈추면 애니메이션 stop
-        if (player.climbInput == 0)
-        {
-            player.animator.speed = 0;
-        }
-        else
-        {
-            player.animator.speed = 1f;
-        }
-
-        // Idle
-        if (player.isGrounded)
-        {
-            player.stateMachine.ChangeState(player.stateMachine.playerStateDic[PlayerEState.Idle]);
-        }
-    }
-
-    public override void FixedUpdate()
-    {
-        
-        player.rigid.velocity = new Vector2(player.rigid.velocity.x, player.climbInput * player.moveSpeed);
-    }
-
-    public override void Exit()
-    {
-        Debug.Log("Climb Exit");
-        player.animator.speed = 1f;
-        player.isClimbing = false;
-        player.rigid.gravityScale = Player.initialPlayerGravityScale;
-    }
-}
-#endregion
-
-#region Attack
-public class Player_Attack : PlayerState
-{
-    public Player_Attack(Player _player) : base(_player)
-    {
-        hasPhysics = true;
-    }
-
-    public override void Enter()
-    {
-        //Debug.Log("Climb Enter");
-        player.animator.Play(player.Climb_HASH);
+        player.animator.Play(player.CLIMB_HASH);
 
         player.isJumped = false;
         player.isGrounded = false;
@@ -281,6 +235,36 @@ public class Player_Attack : PlayerState
         player.animator.speed = 1f;
         player.isClimbing = false;
         player.rigid.gravityScale = Player.initialPlayerGravityScale;
+    }
+}
+#endregion
+
+#region Hurt
+public class Player_Hurt : PlayerState
+{
+    public Player_Hurt(Player _player) : base(_player)
+    {
+        hasPhysics = false;
+    }
+
+    public override void Enter()
+    {
+        Debug.Log("Hurt Enter");
+        player.isDamaged = false;
+        player.animator.Play(player.HURT_HASH);
+        player.rigid.velocity = Vector2.zero;
+        player.rigid.AddForce(new Vector2(-player.facingDir * 10f, 10f), ForceMode2D.Impulse);
+    }
+
+    public override void Update()
+    {
+        base.Update();
+        //player.stateMachine.ChangeState(player.stateMachine.playerStateDic[PlayerEState.Idle]);
+    }
+
+    public override void Exit()
+    {
+
     }
 }
 #endregion

@@ -94,6 +94,7 @@ public class EnemyController : MonoBehaviour, IDamageable
             IDamageable target = collision.gameObject.GetComponent<IDamageable>();
             target?.TakeDamage();
             Debug.Log("Player¿Í Ãæµ¹!");
+            StartCoroutine(CoTurnBack());
         }
     }
 }
