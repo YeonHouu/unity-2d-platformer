@@ -113,5 +113,4 @@ public class Enemy_Die : EnemyState
     {
 
     }
-
 }

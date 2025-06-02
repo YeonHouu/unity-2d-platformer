@@ -1077,7 +1077,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5060893581998440371, guid: aa903588ae435d349a9a556939fbdfe6, type: 3}
       propertyPath: m_Name
-      value: Enemy
+      value: Bunny
       objectReference: {fileID: 0}
     - target: {fileID: 8347677224136147085, guid: aa903588ae435d349a9a556939fbdfe6, type: 3}
       propertyPath: m_LocalPosition.x

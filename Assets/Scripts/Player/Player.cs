@@ -1,3 +1,4 @@
+using Unity.Burst.CompilerServices;
 using UnityEngine;
 
 
@@ -114,9 +115,12 @@ public class Player : MonoBehaviour
     private void CheckEnemy()
     {
         Collider2D enemy = Physics2D.OverlapBox(groundCheckPos.position, new Vector2(boxWidth, boxHeight), 0f, enemyLayer);
-        if(enemy != null)
+        IDamageable target = enemy?.GetComponent<IDamageable>();
+
+        if (enemy != null)
         {
             Debug.Log("Enemy π‚¿Ω!");
+            target.TakeDamage();
             isAttacked = true;
         }
     }
