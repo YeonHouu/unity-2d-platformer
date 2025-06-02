@@ -17,7 +17,7 @@ public class StateMachine
     // State ÀüÀÌ
     public void ChangeState(BaseState changedState)
     {
-        Debug.Log($"Changing state to {CurState}");
+        //Debug.Log($"Changing state to {CurState}");
         if (CurState == changedState)
         {
             return;

@@ -11,6 +11,12 @@ public class Player : MonoBehaviour
     [SerializeField] private float groundCheckRadius = 0.1f;
     [SerializeField] private LayerMask groundLayer;
 
+    [Header("Attack")]
+    [SerializeField] private float boxWidth = 0.8f;
+    [SerializeField] private float boxHeight = 0.1f;
+    [SerializeField] private LayerMask enemyLayer;
+    public bool isAttacked;
+
     [Header("Ladder")]
     public float centerX;
 
@@ -75,6 +81,7 @@ public class Player : MonoBehaviour
         //Debug.Log($"isClimbing : {isClimbing}");
 
         CheckGround();
+        CheckEnemy();
     }
 
     private void FixedUpdate()
@@ -104,12 +111,28 @@ public class Player : MonoBehaviour
         isGrounded = Physics2D.OverlapCircle(groundCheckPos.position, groundCheckRadius, groundLayer);
     }
 
+    private void CheckEnemy()
+    {
+        Collider2D enemy = Physics2D.OverlapBox(groundCheckPos.position, new Vector2(boxWidth, boxHeight), 0f, enemyLayer);
+        if(enemy != null)
+        {
+            Debug.Log("Enemy π‚¿Ω!");
+            isAttacked = true;
+        }
+    }
+
     private void OnDrawGizmos()
     {
         if (groundCheckPos != null)
         {
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(groundCheckPos.position, groundCheckRadius);
+        }
+
+        if (groundCheckPos != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireCube(groundCheckPos.position, new Vector2(boxWidth, boxHeight));
         }
     }
 }

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public enum PlayerEState
 {
-    Idle, Run, Jump, Crouch, Climb, Hurt
+    Idle, Run, Jump, Crouch, Climb, Hurt, Attack
 }
 
 public class PlayerState : BaseState
@@ -49,7 +49,7 @@ public class Player_Idle : PlayerState
     public override void Enter()
     {
         base.Enter();
-        Debug.Log("Idle Enter");
+        //Debug.Log("Idle Enter");
         player.animator.Play(player.IDLE_HASH);
         player.rigid.velocity = Vector3.zero;
     }
@@ -78,7 +78,7 @@ public class Player_Run : PlayerState
     public override void Enter()
     {
         base.Enter();
-        Debug.Log("Run Enter");
+        //Debug.Log("Run Enter");
         player.animator.Play(player.Run_HASH);
     }
 
@@ -120,22 +120,24 @@ public class Player_Jump : PlayerState
 
     public override void Enter()
     {
-        Debug.Log("Jump Enter");
+        //Debug.Log("Jump Enter");
         jumpTimer = 0;
         player.animator.Play(player.Jump_HASH);
         player.rigid.AddForce(Vector2.up * player.jumpPower, ForceMode2D.Impulse);
         player.isJumped = false;
         player.isGrounded = false;
+        player.isAttacked = false;
     }
 
     public override void Update()
     {
         base.Update();
+        EnemyHit();
 
         jumpTimer += Time.deltaTime;
 
         // 최소 점프 시간 보장
-        if (jumpTimer > 0.15f && player.isGrounded)
+        if (jumpTimer > 0.05f && player.isGrounded)
         {
             player.stateMachine.ChangeState(player.stateMachine.playerStateDic[PlayerEState.Idle]);
         }
@@ -153,6 +155,17 @@ public class Player_Jump : PlayerState
     {
         player.rigid.velocity = new Vector2(player.moveInput * player.moveSpeed, player.rigid.velocity.y);
     }
+
+    private void EnemyHit()
+    {
+        if(player.isAttacked)
+        {
+            //player.rigid.AddForce(Vector2.up * player.jumpPower, ForceMode2D.Impulse);
+            player.rigid.velocity = new Vector2(player.rigid.velocity.x, player.jumpPower);
+            Debug.Log("점프 반동 점프");
+            player.isAttacked = false;
+        }
+    }
 }
 #endregion
 
@@ -166,7 +179,7 @@ public class Player_Climb : PlayerState
 
     public override void Enter()
     {
-        Debug.Log("Climb Enter");
+        //Debug.Log("Climb Enter");
         player.animator.Play(player.Climb_HASH);
 
         player.isJumped = false;
@@ -201,6 +214,64 @@ public class Player_Climb : PlayerState
     public override void FixedUpdate()
     {
         
+        player.rigid.velocity = new Vector2(player.rigid.velocity.x, player.climbInput * player.moveSpeed);
+    }
+
+    public override void Exit()
+    {
+        Debug.Log("Climb Exit");
+        player.animator.speed = 1f;
+        player.isClimbing = false;
+        player.rigid.gravityScale = Player.initialPlayerGravityScale;
+    }
+}
+#endregion
+
+#region Attack
+public class Player_Attack : PlayerState
+{
+    public Player_Attack(Player _player) : base(_player)
+    {
+        hasPhysics = true;
+    }
+
+    public override void Enter()
+    {
+        //Debug.Log("Climb Enter");
+        player.animator.Play(player.Climb_HASH);
+
+        player.isJumped = false;
+        player.isGrounded = false;
+
+        player.rigid.gravityScale = 0f;
+        player.transform.position = new Vector2(player.centerX, player.transform.position.y);
+        player.rigid.velocity = new Vector2(0f, 0f);
+    }
+
+    public override void Update()
+    {
+        base.Update();
+
+        // climbing 중 움직임 멈추면 애니메이션 stop
+        if (player.climbInput == 0)
+        {
+            player.animator.speed = 0;
+        }
+        else
+        {
+            player.animator.speed = 1f;
+        }
+
+        // Idle
+        if (player.isGrounded)
+        {
+            player.stateMachine.ChangeState(player.stateMachine.playerStateDic[PlayerEState.Idle]);
+        }
+    }
+
+    public override void FixedUpdate()
+    {
+
         player.rigid.velocity = new Vector2(player.rigid.velocity.x, player.climbInput * player.moveSpeed);
     }
 
