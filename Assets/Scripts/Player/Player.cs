@@ -1,10 +1,12 @@
+using System;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
 
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour , IDamageable
 {
     public StateMachine stateMachine;
+
     [SerializeField] private LadderSensor ladderSensor;
 
     [Header("Ground Check Settings")]
@@ -13,10 +15,12 @@ public class Player : MonoBehaviour
     [SerializeField] private LayerMask groundLayer;
 
     [Header("Attack")]
+    [SerializeField] private Transform enemyCheckPos;
     [SerializeField] private float boxWidth = 0.8f;
     [SerializeField] private float boxHeight = 0.1f;
     [SerializeField] private LayerMask enemyLayer;
     public bool isAttacked;
+    public static event Action<Player> OnPlayerDamaged;
 
     [Header("Ladder")]
     public float centerX;
@@ -76,10 +80,6 @@ public class Player : MonoBehaviour
         isClimbing = climbInput != 0;
 
         stateMachine.Update();
-        //Debug.Log($"isGrounded : {isGrounded}");
-        //Debug.Log($"isLadder : {isLadder}");
-        //Debug.Log($"gravityScale : {rigid.gravityScale}");
-        //Debug.Log($"isClimbing : {isClimbing}");
 
         CheckGround();
         CheckEnemy();
@@ -114,7 +114,7 @@ public class Player : MonoBehaviour
 
     private void CheckEnemy()
     {
-        Collider2D enemy = Physics2D.OverlapBox(groundCheckPos.position, new Vector2(boxWidth, boxHeight), 0f, enemyLayer);
+        Collider2D enemy = Physics2D.OverlapBox(enemyCheckPos.position, new Vector2(boxWidth, boxHeight), 0f, enemyLayer);
         IDamageable target = enemy?.GetComponent<IDamageable>();
 
         if (enemy != null)
@@ -123,6 +123,12 @@ public class Player : MonoBehaviour
             target.TakeDamage();
             isAttacked = true;
         }
+    }
+
+    public void TakeDamage()
+    {
+        OnPlayerDamaged?.Invoke(this);
+        Debug.Log("플레이어 공격받음");
     }
 
     private void OnDrawGizmos()
@@ -136,7 +142,7 @@ public class Player : MonoBehaviour
         if (groundCheckPos != null)
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireCube(groundCheckPos.position, new Vector2(boxWidth, boxHeight));
+            Gizmos.DrawWireCube(enemyCheckPos.position, new Vector2(boxWidth, boxHeight));
         }
     }
 }

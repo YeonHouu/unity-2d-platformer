@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class EnemyController : MonoBehaviour, IDamageable
 {
@@ -31,6 +32,12 @@ public class EnemyController : MonoBehaviour, IDamageable
     void Update()
     {
         Patrol();
+    }
+
+    private void FixedUpdate()
+    {
+        if (isWaited == false)
+            rigid.velocity = walkVec * moveSpeed;
     }
 
     private void Patrol()
@@ -66,16 +73,10 @@ public class EnemyController : MonoBehaviour, IDamageable
         animator.Play(WALK_HASH);
     }
 
-    private void FixedUpdate()
-    {
-        if (isWaited == false)
-            rigid.velocity = walkVec * moveSpeed;
-    }
-
     public void TakeDamage()
     {
         OnEnemyDamaged?.Invoke(this);
-        Debug.Log($"{gameObject.name} 공격받음");
+        //Debug.Log($"{gameObject.name} 공격받음");
 
         animator.Play(DIE_HASH);
     }
@@ -83,6 +84,16 @@ public class EnemyController : MonoBehaviour, IDamageable
     public void DestroyGameObject()
     {
         Destroy(gameObject);
-        Debug.Log($"{gameObject.name} 삭제");
+        //Debug.Log($"{gameObject.name} 삭제");
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            IDamageable target = collision.gameObject.GetComponent<IDamageable>();
+            target?.TakeDamage();
+            Debug.Log("Player와 충돌!");
+        }
     }
 }
