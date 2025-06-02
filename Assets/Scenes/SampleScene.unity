@@ -2369,6 +2369,8 @@ GameObject:
   - component: {fileID: 1539901474}
   - component: {fileID: 1539901473}
   - component: {fileID: 1539901472}
+  - component: {fileID: 1539901478}
+  - component: {fileID: 1539901479}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -2437,7 +2439,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!95 &1539901474
 Animator:
   serializedVersion: 5
@@ -2526,6 +2528,43 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1539901478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1539901471}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f860f4b850ef474d9001ab5d9784458, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 3
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 128
+--- !u!114 &1539901479
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1539901471}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee5963e66b128f54ca4fcc935f245608, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 3
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  rigid: {fileID: 1539901473}
+  animator: {fileID: 1539901474}
+  spriteRenderer: {fileID: 1539901475}
+  walkVec: {x: 0, y: 0}
+  isWaited: 0
 --- !u!1 &2025285535
 GameObject:
   m_ObjectHideFlags: 3
