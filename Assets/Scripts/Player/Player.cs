@@ -1,15 +1,26 @@
+using System;
+using Unity.Burst.CompilerServices;
 using UnityEngine;
 
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour , IDamageable
 {
     public StateMachine stateMachine;
+
     [SerializeField] private LadderSensor ladderSensor;
 
     [Header("Ground Check Settings")]
     [SerializeField] private Transform groundCheckPos;
     [SerializeField] private float groundCheckRadius = 0.1f;
     [SerializeField] private LayerMask groundLayer;
+
+    [Header("Attack")]
+    [SerializeField] private Transform enemyCheckPos;
+    [SerializeField] private float boxWidth = 0.8f;
+    [SerializeField] private float boxHeight = 0.1f;
+    [SerializeField] private LayerMask enemyLayer;
+    public bool isAttacked;
+    public static event Action<Player> OnPlayerDamaged;
 
     [Header("Ladder")]
     public float centerX;
@@ -25,18 +36,20 @@ public class Player : MonoBehaviour
     public const float initialPlayerGravityScale = 3f;
     public float moveInput;
     public float climbInput;
+    public int facingDir;
     [Space(10)]
     public bool isJumped;
     public bool isGrounded;
     public bool isLadder;
     public bool isClimbing;
+    public bool isDamaged;
 
     public readonly int IDLE_HASH = Animator.StringToHash("Idle_Fox");
-    public readonly int Run_HASH = Animator.StringToHash("Run_Fox");
-    public readonly int Jump_HASH = Animator.StringToHash("Jump_Fox");
+    public readonly int RUN_HASH = Animator.StringToHash("Run_Fox");
+    public readonly int JUMP_HASH = Animator.StringToHash("Jump_Fox");
     public readonly int Crouch_HASH = Animator.StringToHash("Crouch_Fox");
-    public readonly int Climb_HASH = Animator.StringToHash("Climb_Fox");
-    public readonly int Hurt_HASH = Animator.StringToHash("Hurt_Fox");
+    public readonly int CLIMB_HASH = Animator.StringToHash("Climb_Fox");
+    public readonly int HURT_HASH = Animator.StringToHash("Hurt_Fox");
     
     private void Start()
     {
@@ -57,6 +70,7 @@ public class Player : MonoBehaviour
         stateMachine.playerStateDic.Add(PlayerEState.Run, new Player_Run(this));
         stateMachine.playerStateDic.Add(PlayerEState.Jump, new Player_Jump(this));
         stateMachine.playerStateDic.Add(PlayerEState.Climb, new Player_Climb(this));
+        stateMachine.playerStateDic.Add(PlayerEState.Hurt, new Player_Hurt(this));
 
         stateMachine.CurState = stateMachine.playerStateDic[PlayerEState.Idle];
     }
@@ -69,12 +83,9 @@ public class Player : MonoBehaviour
         isClimbing = climbInput != 0;
 
         stateMachine.Update();
-        //Debug.Log($"isGrounded : {isGrounded}");
-        //Debug.Log($"isLadder : {isLadder}");
-        //Debug.Log($"gravityScale : {rigid.gravityScale}");
-        //Debug.Log($"isClimbing : {isClimbing}");
 
         CheckGround();
+        CheckEnemy();
     }
 
     private void FixedUpdate()
@@ -104,12 +115,37 @@ public class Player : MonoBehaviour
         isGrounded = Physics2D.OverlapCircle(groundCheckPos.position, groundCheckRadius, groundLayer);
     }
 
+    private void CheckEnemy()
+    {
+        Collider2D enemy = Physics2D.OverlapBox(enemyCheckPos.position, new Vector2(boxWidth, boxHeight), 0f, enemyLayer);
+        IDamageable target = enemy?.GetComponent<IDamageable>();
+
+        if (enemy != null)
+        {
+            Debug.Log("Enemy π‚¿Ω!");
+            target.TakeDamage();
+            isAttacked = true;
+        }
+    }
+
+    public void TakeDamage()
+    {
+        OnPlayerDamaged?.Invoke(this);
+        isDamaged = true;
+    }
+
     private void OnDrawGizmos()
     {
         if (groundCheckPos != null)
         {
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(groundCheckPos.position, groundCheckRadius);
+        }
+
+        if (groundCheckPos != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireCube(enemyCheckPos.position, new Vector2(boxWidth, boxHeight));
         }
     }
 }
