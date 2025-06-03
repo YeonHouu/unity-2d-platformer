@@ -86,6 +86,8 @@ public class Player : MonoBehaviour , IDamageable
 
         CheckGround();
         CheckEnemy();
+
+        Debug.Log($"isLadder: {isLadder}");
     }
 
     private void FixedUpdate()
