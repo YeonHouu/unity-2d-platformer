@@ -217,7 +217,7 @@ public class Player_Climb : PlayerState
         }
 
         // Idle
-        if (player.isGrounded)
+        if (!player.isLadder)
         {
             player.stateMachine.ChangeState(player.stateMachine.playerStateDic[PlayerEState.Idle]);
         }
