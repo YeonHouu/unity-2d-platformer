@@ -35,7 +35,7 @@ public class PlayerState : BaseState
         }
 
         // Hurt
-        if(player.isDamaged)
+        if (player.isDamaged)
         {
             player.stateMachine.ChangeState(player.stateMachine.playerStateDic[PlayerEState.Hurt]);
         }
@@ -240,6 +240,7 @@ public class Player_Climb : PlayerState
 #region Hurt
 public class Player_Hurt : PlayerState
 {
+    private float animationTimer;
     public Player_Hurt(Player _player) : base(_player)
     {
         hasPhysics = false;
@@ -248,6 +249,7 @@ public class Player_Hurt : PlayerState
     public override void Enter()
     {
         Debug.Log("Hurt Enter");
+        animationTimer = 0;
         player.isDamaged = false;
         player.animator.Play(player.HURT_HASH);
         player.rigid.velocity = Vector2.zero;
@@ -257,12 +259,12 @@ public class Player_Hurt : PlayerState
     public override void Update()
     {
         base.Update();
-        //player.stateMachine.ChangeState(player.stateMachine.playerStateDic[PlayerEState.Idle]);
-    }
+        animationTimer += Time.deltaTime;
 
-    public override void Exit()
-    {
-
+        if (animationTimer > 1f)
+        {
+            player.stateMachine.ChangeState(player.stateMachine.playerStateDic[PlayerEState.Idle]);
+        }
     }
 }
 #endregion
