@@ -108,8 +108,6 @@ public class Player_Run : PlayerState
             player.facingDir = 1;
             player.spriteRenderer.flipX = false;
         }
-
-
     }
 
     public override void FixedUpdate()

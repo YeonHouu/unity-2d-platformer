@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     private PlayerHealth playerHealth;
+    private Player player;
 
     [SerializeField] private CinemachineVirtualCamera virtualCamera;
 
@@ -53,12 +54,25 @@ public class GameManager : MonoBehaviour
         startSceneButton_end.onClick.AddListener(() => LoadScene("StartScene"));
     }
 
+    private void OnEnable()
+    {
+        // Player의 OnGameEnd 이벤트를 구독
+        Player.OnGameEnd += GameEnd;
+    }
+
+    private void OnDisable()
+    {
+        // 구독 해제 (메모리 누수 방지)
+        Player.OnGameEnd -= GameEnd;
+    }
+
     public void GameOver()
     {
         Debug.Log("게임오버");
         StopCamera();
         gameOverPanel.gameObject.SetActive(true);
     }
+
     public void GameEnd()
     {
         Debug.Log("게임엔딩");

@@ -8,6 +8,8 @@ public class Player : MonoBehaviour , IDamageable
     private PlayerHealth playerHealth;
     public StateMachine stateMachine;
 
+    public static event System.Action OnGameEnd;
+
     [SerializeField] private LadderSensor ladderSensor;
 
     [Header("Ground Check Settings")]
@@ -139,6 +141,18 @@ public class Player : MonoBehaviour , IDamageable
         OnPlayerDamaged?.Invoke(this);
         isDamaged = true;
         playerHealth.TakeDamage(1);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        Debug.Log("충돌발생");
+
+        if (collision.CompareTag("EndPoint"))
+        {
+            Debug.Log("엔드포인트 충돌발생2");
+            moveSpeed = 0;
+            OnGameEnd?.Invoke();
+        }
     }
 
     private void OnDrawGizmos()
