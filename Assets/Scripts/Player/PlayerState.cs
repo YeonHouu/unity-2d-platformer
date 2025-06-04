@@ -137,7 +137,7 @@ public class Player_Jump : PlayerState
         player.rigid.AddForce(Vector2.up * player.jumpPower, ForceMode2D.Impulse);
         player.isJumped = false;
         player.isGrounded = false;
-        player.isAttacked = false;
+        player.isAttack = false;
     }
 
     public override void Update()
@@ -171,11 +171,11 @@ public class Player_Jump : PlayerState
 
     private void EnemyHit()
     {
-        if (player.isAttacked)
+        if (player.isAttack)
         {
             player.rigid.velocity = new Vector2(player.rigid.velocity.x, player.jumpPower);
             Debug.Log("점프 반동 점프");
-            player.isAttacked = false;
+            player.isAttack = false;
         }
     }
 }

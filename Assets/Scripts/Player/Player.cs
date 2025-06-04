@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour , IDamageable
 {
+    private PlayerHealth playerHealth;
     public StateMachine stateMachine;
 
     [SerializeField] private LadderSensor ladderSensor;
@@ -19,7 +20,7 @@ public class Player : MonoBehaviour , IDamageable
     [SerializeField] private float boxWidth = 0.8f;
     [SerializeField] private float boxHeight = 0.1f;
     [SerializeField] private LayerMask enemyLayer;
-    public bool isAttacked;
+    public bool isAttack;
     public static event Action<Player> OnPlayerDamaged;
 
     [Header("Ladder")]
@@ -87,7 +88,7 @@ public class Player : MonoBehaviour , IDamageable
         CheckGround();
         CheckEnemy();
 
-        Debug.Log($"isLadder: {isLadder}");
+        //Debug.Log($"isLadder: {isLadder}");
     }
 
     private void FixedUpdate()
@@ -126,7 +127,7 @@ public class Player : MonoBehaviour , IDamageable
         {
             Debug.Log("Enemy π‚¿Ω!");
             target.TakeDamage();
-            isAttacked = true;
+            isAttack = true;
         }
     }
 
@@ -134,6 +135,7 @@ public class Player : MonoBehaviour , IDamageable
     {
         OnPlayerDamaged?.Invoke(this);
         isDamaged = true;
+        playerHealth.TakeDamage(1);
     }
 
     private void OnDrawGizmos()
