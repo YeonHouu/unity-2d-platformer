@@ -6,9 +6,10 @@ public class PlayerHealth : MonoBehaviour
     private GameManager gameManager;
 
     [SerializeField] private int maxHP = 3;
+    [SerializeField] private int currentHP = 3;
+    [SerializeField] private GameObject Pop;
     //[SerializeField] private float fallThresholdY = -10f;
 
-    private int currentHP;
     private bool isDie = false;
     public bool IsDead() => isDie;
 
@@ -35,16 +36,21 @@ public class PlayerHealth : MonoBehaviour
     // 몬스터 데미지
     public void TakeDamage(int amount)
     {
-        if (currentHP > 0)
+        Debug.Log("PlayerHealth: TakeDamage");
+        if (currentHP > 1)
         {
-            if (!player.isDamaged)
+            if (player.isDamaged)
             {
                 currentHP -= amount;
+                Debug.Log($"currentHP: {currentHP}");
             }
         }
         else
         {
             isDie = true;
+            Debug.Log($"isDie: {isDie}");
+            Instantiate(Pop, transform.position, Quaternion.identity);
+            Destroy(gameObject);
             gameManager.GameOver();
         }
     }

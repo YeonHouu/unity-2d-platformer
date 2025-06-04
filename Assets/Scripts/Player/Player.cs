@@ -52,11 +52,12 @@ public class Player : MonoBehaviour , IDamageable
     public readonly int CLIMB_HASH = Animator.StringToHash("Climb_Fox");
     public readonly int HURT_HASH = Animator.StringToHash("Hurt_Fox");
     
-    private void Start()
+    private void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        playerHealth = GetComponent<PlayerHealth>();
 
         ladderSensor.OnEnter += HandleLadderEnter;
         ladderSensor.OnExit += HandleLadderExit;
@@ -133,6 +134,8 @@ public class Player : MonoBehaviour , IDamageable
 
     public void TakeDamage()
     {
+        Debug.Log("TakeDamage");
+
         OnPlayerDamaged?.Invoke(this);
         isDamaged = true;
         playerHealth.TakeDamage(1);
