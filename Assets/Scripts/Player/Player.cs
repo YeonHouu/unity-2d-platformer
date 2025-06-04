@@ -5,7 +5,10 @@ using UnityEngine;
 
 public class Player : MonoBehaviour , IDamageable
 {
+    private PlayerHealth playerHealth;
     public StateMachine stateMachine;
+
+    public static event System.Action OnGameEnd;
 
     [SerializeField] private LadderSensor ladderSensor;
 
@@ -19,7 +22,7 @@ public class Player : MonoBehaviour , IDamageable
     [SerializeField] private float boxWidth = 0.8f;
     [SerializeField] private float boxHeight = 0.1f;
     [SerializeField] private LayerMask enemyLayer;
-    public bool isAttacked;
+    public bool isAttack;
     public static event Action<Player> OnPlayerDamaged;
 
     [Header("Ladder")]
@@ -51,11 +54,12 @@ public class Player : MonoBehaviour , IDamageable
     public readonly int CLIMB_HASH = Animator.StringToHash("Climb_Fox");
     public readonly int HURT_HASH = Animator.StringToHash("Hurt_Fox");
     
-    private void Start()
+    private void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        playerHealth = GetComponent<PlayerHealth>();
 
         ladderSensor.OnEnter += HandleLadderEnter;
         ladderSensor.OnExit += HandleLadderExit;
@@ -87,7 +91,7 @@ public class Player : MonoBehaviour , IDamageable
         CheckGround();
         CheckEnemy();
 
-        Debug.Log($"isLadder: {isLadder}");
+        //Debug.Log($"isLadder: {isLadder}");
     }
 
     private void FixedUpdate()
@@ -126,14 +130,29 @@ public class Player : MonoBehaviour , IDamageable
         {
             Debug.Log("Enemy 밟음!");
             target.TakeDamage();
-            isAttacked = true;
+            isAttack = true;
         }
     }
 
     public void TakeDamage()
     {
+        Debug.Log("TakeDamage");
+
         OnPlayerDamaged?.Invoke(this);
         isDamaged = true;
+        playerHealth.TakeDamage(1);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        Debug.Log("충돌발생");
+
+        if (collision.CompareTag("EndPoint"))
+        {
+            Debug.Log("엔드포인트 충돌발생2");
+            moveSpeed = 0;
+            OnGameEnd?.Invoke();
+        }
     }
 
     private void OnDrawGizmos()
