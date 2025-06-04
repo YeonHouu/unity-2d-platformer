@@ -12,12 +12,12 @@ public class SceneChanger : MonoBehaviour
     {
         if (startButton != null)
         {
-            startButton.onClick.AddListener(() => ChangeScene("GameScene"));
+            startButton.onClick.AddListener(() => ChangeScene("PlayScene"));
         }
     }
 
     public void ChangeScene(string sceneName)
     {
-        SceneManager.LoadScene("PlayScene");
+        SceneManager.LoadScene(sceneName);
     }
 }
